@@ -1,0 +1,37 @@
+<?php
+    defined('MOODLE_INTERNAL') || die();
+    global $OUTPUT;
+
+    // We assume that we are included in auth_plugin_mdk::config_form()
+    $config = $this->init_config($config);
+
+    $yesno = array( get_string('no'), get_string('yes') );
+    $gravatardefaults = array('random' => get_string('anyofthese', 'auth_mdk'), 'identicon' => 'identicon',
+            'monsterid' => 'monsterid', 'wavatar' => 'wavatar', 'retro' => 'retro');
+?>
+<table cellspacing="0" cellpadding="5" border="0">
+
+<tr valign="top" class="">
+    <td align="right"><label for="adduserpicture"><?php print_string("adduserpicture", "auth_mdk") ?></label></td>
+    <td>
+        <?php echo html_writer::select($yesno, 'adduserpicture', $config->adduserpicture, false); ?>
+    </td>
+    <td><?php print_string("adduserpicturehelp", "auth_mdk") ?></td>
+</tr>
+
+<tr valign="top" class="">
+    <td align="right"><label for="downloadgravatar"><?php print_string("downloadgravatar", "auth_mdk") ?></label></td>
+    <td>
+        <?php echo html_writer::select($yesno, 'downloadgravatar', $config->downloadgravatar, false); ?>
+    </td>
+    <td><?php print_string("downloadgravatarhelp", "auth_mdk") ?></td>
+</tr>
+
+<tr valign="top" class="">
+    <td align="right"><label for="gravatardefault"><?php print_string("gravatardefault", "auth_mdk") ?></label></td>
+    <td>
+        <?php echo html_writer::select($gravatardefaults, 'gravatardefault', $config->gravatardefault, false); ?>
+    </td>
+    <td><?php print_string("gravatardefaulthelp", "auth_mdk") ?></td>
+</tr>
+</table>
