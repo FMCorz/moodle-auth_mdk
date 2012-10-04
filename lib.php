@@ -55,7 +55,7 @@ function auth_mdk_user_created_event($user) {
         $config->gravatardefault = 'wavatar';
     }
 
-    // User isset() and empty() because we want 
+    // User isset() and empty() because we want
     if (empty($config->adduserpicture)) {
         return;
     }
@@ -92,7 +92,10 @@ function auth_mdk_user_created_event($user) {
         $picture = $tempdir . '/' . 'auth_mdk.jpg';
 
         require_once($CFG->libdir . '/filelib.php');
-        download_file_content($url->out(false), null, null, false, 5, 2, false, $picture);
+        // If there was a problem during the download of the picture, cancel the operation.
+        if (!download_file_content($url->out(false), null, null, false, 5, 2, false, $picture)) {
+            return;
+        }
     }
 
     // Ensures retro compatibility
