@@ -44,7 +44,7 @@ function auth_mdk_user_created_event($user) {
     $config = get_config('auth/mdk');
     $picture = false;
 
-    // Set default values for config (useful when the admin did not set the settings)
+    // Set default values for config (useful when the admin did not set the settings).
     if (!isset($config->adduserpicture)) {
         $config->adduserpicture = '1';
     }
@@ -55,12 +55,12 @@ function auth_mdk_user_created_event($user) {
         $config->gravatardefault = 'wavatar';
     }
 
-    // User isset() and empty() because we want
+    // Does the config want to add a picture to the user?
     if (empty($config->adduserpicture)) {
         return;
     }
 
-    // Reading local pics folder for matching file name
+    // Reading local pics folder for matching file name.
     $fullname = strtolower(preg_replace('/[^a-z0-9_-]/i', '_', $user->firstname . '_' . $user->lastname)) . '.jpg';
     $usernamefile = $path . $user->username . '.jpg';
     if (is_file($path . $fullname)) {
@@ -69,7 +69,7 @@ function auth_mdk_user_created_event($user) {
         $picture = $usernamefile;
     }
 
-    // Downloading an image from Gravatar
+    // Downloading an image from Gravatar.
     if (!$picture && !empty($config->downloadgravatar)) {
         $types = array('identicon', 'monsterid', 'wavatar', 'retro');
         $type = $config->gravatardefault;
@@ -83,13 +83,19 @@ function auth_mdk_user_created_event($user) {
         );
         $url = new moodle_url('http://www.gravatar.com/avatar/' . md5($user->id . ':' . $user->username), $params);
 
-        // Temporary file name
+        // Temporary file name and directories.
         if (empty($CFG->tempdir)) {
             $tempdir = $CFG->dataroot . "/temp";
         } else {
             $tempdir = $CFG->tempdir;
         }
         $picture = $tempdir . '/' . 'auth_mdk.jpg';
+
+        // Checking if the directory exists (will automatically create it if required).
+        // Using this instead of make_temp_directory() ensures backward compatibility with Moodle >= 2.0.
+        if (!check_dir_exists($tempdir, true, true)) {
+            return;
+        }
 
         require_once($CFG->libdir . '/filelib.php');
         // If there was a problem during the download of the picture, cancel the operation.
@@ -98,7 +104,7 @@ function auth_mdk_user_created_event($user) {
         }
     }
 
-    // Ensures retro compatibility
+    // Ensures retro compatibility.
     if (class_exists('context_user')) {
         $context = context_user::instance($user->id);
     } else {
