@@ -50,6 +50,9 @@ class auth_plugin_mdk extends auth_plugin_base {
      * @return void
      */
     public function init_config($config) {
+        if (!isset($config->useusernameas)) {
+            $config->useusernameas = '0';
+        }
         if (!isset($config->adduserpicture)) {
             $config->adduserpicture = '1';
         }
@@ -210,7 +213,9 @@ class auth_plugin_mdk extends auth_plugin_base {
             }
         }
 
-        return array_merge($default, $data);
+        $data = array_merge($default, $data);
+        $data = $this->do_use_username_as($username, $data);
+        return $data;
     }
 
     /**
@@ -284,6 +289,70 @@ class auth_plugin_mdk extends auth_plugin_base {
     }
 
     /**
+     * Does the logic to use the user name in the user details (first and last names).
+     *
+     * @param string $username the username of the user.
+     * @param array $data the complete array of details of the user.
+     * @return array of details.
+     */
+    public function do_use_username_as($username, $data) {
+        switch($this->config->useusernameas) {
+            case 'first':
+                $data['firstname'] = $username;
+                break;
+            case 'last':
+                $data['lastname'] = $username;
+                break;
+            case 'both':
+                $data['firstname'] = $username;
+                $data['lastname'] = $username;
+                break;
+            case 'prefix_first':
+                $data['firstname'] = $username . ' ' . $data['firstname'];
+                break;
+            case 'prefix_last':
+                $data['lastname'] = $username . ' ' . $data['lastname'];
+                break;
+            case 'prefix_both':
+                $data['firstname'] = $username . ' ' . $data['firstname'];
+                $data['lastname'] = $username . ' ' . $data['lastname'];
+                break;
+            case 'suffix_first':
+                $data['firstname'] .= ' ' . $username;
+                break;
+            case 'suffix_last':
+                $data['lastname'] .= ' ' . $username;
+                break;
+            case 'suffix_both':
+                $data['firstname'] .= ' ' . $username;
+                $data['lastname'] .= ' ' . $username;
+            default:
+                break;
+        }
+        return $data;
+    }
+
+    /**
+     * Returns the list of options for the config usernameas.
+     *
+     * @return array of options
+     */
+    public function get_usernameas_options() {
+        return array(
+            0               =>    get_string('nothing', 'auth_mdk'),
+            'first'         =>    get_string('firstname'),
+            'last'          =>    get_string('lastname'),
+            'both'          =>    get_string('bothfirstandlastname', 'auth_mdk'),
+            'prefix_first'  =>    get_string('prefixfirstname', 'auth_mdk'),
+            'prefix_last'   =>    get_string('prefixlastname', 'auth_mdk'),
+            'prefix_both'   =>    get_string('prefixboth', 'auth_mdk'),
+            'suffix_first'  =>    get_string('suffixfirstname', 'auth_mdk'),
+            'suffix_last'   =>    get_string('suffixlastname', 'auth_mdk'),
+            'suffix_both'   =>    get_string('suffixboth', 'auth_mdk'),
+        );
+    }
+
+    /**
      * Check for patterns and replace them
      *
      * @param string $value the string to work on
@@ -310,6 +379,7 @@ class auth_plugin_mdk extends auth_plugin_base {
      */
     function process_config($config) {
 
+        set_config('useusernameas', $config->useusernameas, 'auth/mdk');
         set_config('adduserpicture', $config->adduserpicture, 'auth/mdk');
         set_config('downloadgravatar', $config->downloadgravatar, 'auth/mdk');
         set_config('gravatardefault', $config->gravatardefault, 'auth/mdk');

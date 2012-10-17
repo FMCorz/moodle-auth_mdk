@@ -5,11 +5,20 @@
     // We assume that we are included in auth_plugin_mdk::config_form()
     $config = $this->init_config($config);
 
-    $yesno = array( get_string('no'), get_string('yes') );
+    $yesno = array(get_string('no'), get_string('yes'));
+    $useusernameas = $this->get_usernameas_options();
     $gravatardefaults = array('random' => get_string('anyofthese', 'auth_mdk'), 'identicon' => 'identicon',
             'monsterid' => 'monsterid', 'wavatar' => 'wavatar', 'retro' => 'retro');
 ?>
 <table cellspacing="0" cellpadding="5" border="0">
+
+<tr valign="top" class="">
+    <td align="right"><label for="useusernameas"><?php print_string("useusernameas", "auth_mdk") ?></label></td>
+    <td>
+        <?php echo html_writer::select($useusernameas, 'useusernameas', $config->useusernameas, false); ?>
+    </td>
+    <td><?php print_string("useusernameashelp", "auth_mdk") ?></td>
+</tr>
 
 <tr valign="top" class="">
     <td align="right"><label for="adduserpicture"><?php print_string("adduserpicture", "auth_mdk") ?></label></td>
