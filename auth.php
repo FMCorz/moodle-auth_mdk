@@ -259,7 +259,9 @@ class auth_plugin_mdk extends auth_plugin_base {
             $role = $this->get_role($user->username);
             if (!in_array($role->archetype, array('user', 'guest', 'frontpage'))) {
                 $instance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'manual'));
-                $plugin->enrol_user($instance, $user->id, $role->id, $course->startdate, 0);
+                if ($instance) {
+                    $plugin->enrol_user($instance, $user->id, $role->id, $course->startdate, 0);
+                }
             }
         }
     }
